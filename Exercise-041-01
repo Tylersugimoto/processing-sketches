@@ -1,0 +1,166 @@
+/*
+Tyler Sugimoto
+Exercise-41-01
+ListBar, Button, and Radio Button
+*/
+import controlP5.*;
+ControlP5 cp5;
+DropdownList d1, d2;
+Button button;
+Radio[] buttons = new Radio[2];
+void setup() {
+  size(700, 400 );
+  button = new Button(650, 350, 50, color(255), color(200), color(0));
+  buttons[0] = new Radio(620, 250, 30, color(255), color(0), 0, buttons);
+  buttons[1] = new Radio(650, 250, 30, color(255), color(0), 1, buttons);
+  cp5 = new ControlP5(this);
+  d1 = cp5.addDropdownList("List d1")
+          .setPosition(100, 100)
+          ;
+  customize(d1); 
+  d2 = cp5.addDropdownList("List d2")
+          .setPosition(400, 100)
+          .setSize(200,200)
+          ;  
+  customize(d2);
+}
+void customize(DropdownList ddl) {
+  ddl.setBackgroundColor(color(190));
+  ddl.setItemHeight(20);
+  ddl.setBarHeight(15);
+  ddl.getCaptionLabel().set("dropdown");
+  for (int i=0;i<21;i++) {
+    ddl.addItem("item "+i, i);
+  }
+  ddl.setColorBackground(color(60));
+  ddl.setColorActive(color(255, 128));
+}
+void keyPressed() {
+  if(key==CODED){
+  if (keyCode==DOWN) {
+    d1.setHeight(210);
+  } 
+  else if (keyCode==UP) {
+    d1.setHeight(110);
+  }
+  else if (keyCode==RIGHT) {
+    d2.setHeight(110);
+  } 
+  else if (keyCode==LEFT) {
+    d2.setHeight(210);
+  }
+}
+}
+void controlEvent(ControlEvent theEvent) {
+  if (theEvent.isGroup()) {
+    println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
+  } 
+  else if (theEvent.isController()) {
+    println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
+  }
+}
+void draw() {
+  background(128);
+  button.update();
+  button.display();
+  buttons[0].display();
+  buttons[1].display();
+}
+void mousePressed(){
+  button.press();
+  buttons[0].press(mouseX, mouseY);
+  buttons[1].press(mouseX, mouseY);
+}
+void mouseReleased(){
+  button.release();
+}
+//Button Class
+class Button {
+  int x, y;                 
+  int size;               
+  boolean over = false;    
+  boolean pressed = false; 
+  String B = "Button";
+  Button(int xp, int yp, int s, color b, color o, color p) {
+    x = xp;
+    y = yp;
+    size = s;
+  }
+  void update() {
+    if ((mouseX >= x) && (mouseX <= x+size) && 
+        (mouseY >= y) && (mouseY <= y+size)) {
+      over = true;
+    } else {
+      over = false;
+    }
+  }
+  
+  // Respond to mousePressed() event
+  boolean press() {  
+    if (over == true) {
+      pressed = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  // Respond to mouseReleased() event
+  void release() {
+    pressed = false;
+  }
+
+  void display() {
+    if (pressed == true) {
+      d1.clear();
+    } else if (over == true) {
+      fill(255,255,0);
+      text(B, 650, 350, 50, 50);
+    noStroke();
+    rect(x, y, size, size);
+  }
+  }
+}
+//Radio Button Class
+class Radio {
+  int x, y;               
+  int size, dotSize;        
+  color baseGray, dotGray; 
+  boolean checked = false;  
+  int me;                 
+  Radio[] others;           
+
+  Radio(int xp, int yp, int s, color b, color d, int m, Radio[] o) {
+    x = xp;
+    y = yp;
+    size = s;
+    dotSize = size - size/3;
+    baseGray = b;
+    dotGray = d;
+    me = m;
+    others = o;
+  }
+  boolean press(float mx, float my) {
+    if (dist(x, y, mx, my) < size/2) {
+      checked = true;
+      for (int i = 0; i < others.length; i++) {
+        if (i != me) {
+          others[i].checked = false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+  void display() {
+    noStroke();
+    fill(baseGray);
+    ellipse(x, y, size, size);
+    if (checked == true) {
+      d2.clear();
+      fill(dotGray);
+      ellipse(x, y, dotSize, dotSize);
+    }
+  }
+}
